@@ -3,10 +3,38 @@
   对lsblk对了封装，适配磁盘做raid的情况
   可以真实的获取磁盘HDD或SSD类型、磁盘raid类型、磁盘插槽位置
 
+  ### install 
+  
+  ##### 1. install storcli
+  
+  dell machine
+  
+  ```
+  https://downloads.dell.com/FOLDER05235308M/1/perccli_linux_NF8G9_A07_7.529.00.tar.gz
+  tar xf perccli_linux_NF8G9_A07_7.529.00.tar.gz
+  rpm -ivh perccli_*/Linux/*.rpm
+  ```
+  
+  other machine
+  
+  ```
+  wget https://docs.broadcom.com/docs-and-downloads/syncro-shared-storage/downloads/1-15-05_StorCLI.zip
+  unzip 1-15-05_StorCLI.zip
+  unzip storcli_all_os.zip
+  rpm -ivh storcli_all_os/Linux/storcli-1.15.05-1.noarch.rpm
+  ```
+  
+  ##### 2. install pylsblk
+  
+  ```
+  wget https://raw.githubusercontent.com/xiaomudk/pylsblk/master/pylsblk.py -O pylsblk.py
+  chmod +x pylsblk.py
+  ```
+  
   ### usage
   
   ```
-  usage: 1.py [-h] [-o COLUMNS] [-n] ...
+  usage: pylsblk.py [-h] [-o COLUMNS] [-n] ...
 
 positional arguments:
   disk_path
@@ -61,7 +89,7 @@ slot    device slot
 raid    device raid type
   ```
   
-  ### 示例
+  ### example
   
   ```
   # pylsblk.py -o name,rota,slot,raid
