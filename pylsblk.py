@@ -143,7 +143,7 @@ def parseLogicalDevicesString():
     return sn_vd_map, vd_pds, vd_devices
 
 
-def _build_disk_tree(columns=None, disk_path=None):
+def _build_disk_tree(columns=None, include=None, disk_path=None):
     """ Build Block device tree and gather information
         about all disks and partitions avaialbe in the system
     """
@@ -161,8 +161,12 @@ def _build_disk_tree(columns=None, disk_path=None):
             sn_vd_map, vd_pds, vd_devices = parseLogicalDevicesString()
     try:
         columns_str = ','.join(_columns).upper()
-        lsblk_cmd = 'lsblk -d -a -n -r -b -o {columns_str} {disk_path}'.format(columns_str=columns_str,
-                                                                               disk_path=disk_path)
+        lsblk_cmd = 'lsblk -d -a -n -r -b -o {columns_str}'.format(columns_str=columns_str)
+        if include:
+            lsblk_cmd += ' -i {include}'.format(include=','.join(include))
+        if disk_path:
+            lsblk_cmd += ' {disk_path}'.format(disk_path=disk_path)
+
         disk_info_list = getoutput(lsblk_cmd)
 
         for di in disk_info_list.split('\n'):
@@ -248,6 +252,13 @@ def parse_lsblk_columns(parser):
     return columns_list
 
 
+def parse_lsblk_include(parser):
+    var_list = parser.split(',')
+    if [x for x in var_list if not str(x).isdigit()]:
+        raise argparse.ArgumentTypeError("failed to parse list:%s " % parser)
+    return var_list
+
+
 def parse_args():
     epilog = []
     for k, v in DISK_FILTERS.items():
@@ -259,8 +270,10 @@ def parse_args():
         epilog.append('{v}\n'.format(v=v['help_text']))
 
     parser = argparse.ArgumentParser(epilog=''.join(epilog), formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('-o', '--output', help='output columns', default='name', dest='columns',
+    parser.add_argument('-o', '--output <list>', help='output columns', default='name', dest='columns',
                         type=parse_lsblk_columns)
+    parser.add_argument('-I', '--include <list>', help='show only devices with specified major numbers',
+                        default='', dest='include', type=parse_lsblk_include)
     parser.add_argument('-n', '--noheadings', help="don't print headings", action='store_true')
     parser.add_argument('disk_path', nargs=argparse.REMAINDER)
     return parser.parse_args()
@@ -268,7 +281,7 @@ def parse_args():
 
 def main():
     args = parse_args()
-    disk_list = _build_disk_tree(list(args.columns), ' '.join(args.disk_path))
+    disk_list = _build_disk_tree(list(args.columns), list(args.include), ' '.join(args.disk_path))
 
     if args.noheadings is False:
         for columns in args.columns:
