@@ -253,7 +253,9 @@ def parse_lsblk_columns(parser):
 
 
 def parse_lsblk_include(parser):
-    var_list = parser.split(',')
+    # user filter fix empty string split not return empty list
+    # https://stackoverflow.com/questions/16645083/when-splitting-an-empty-string-in-python-why-does-split-return-an-empty-list
+    var_list = filter(None, parser.split(','))
     if [x for x in var_list if not str(x).isdigit()]:
         raise argparse.ArgumentTypeError("failed to parse list:%s " % parser)
     return var_list
