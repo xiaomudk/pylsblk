@@ -163,7 +163,7 @@ def _build_disk_tree(columns=None, include=None, disk_path=None):
         columns_str = ','.join(_columns).upper()
         lsblk_cmd = 'lsblk -d -a -n -r -b -o {columns_str}'.format(columns_str=columns_str)
         if include:
-            lsblk_cmd += ' -i {include}'.format(include=','.join(include))
+            lsblk_cmd += ' -I {include}'.format(include=','.join(include))
         if disk_path:
             lsblk_cmd += ' {disk_path}'.format(disk_path=disk_path)
 
