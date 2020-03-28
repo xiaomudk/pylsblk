@@ -124,7 +124,7 @@ def parseLogicalDevicesString():
     for controller in json.loads(logical_devices).get('Controllers', []):
         if controller["Command Status"]["Status"] == "Success":
 
-            deviceInfos = controller["Response Data"]
+            deviceInfos = controller.get("Response Data", {})
             for key, value in deviceInfos.items():
                 if re.search("/c\d+/v\d+", key):
                     device_number = int(re.search("/c\d+/v(\d+)", key).group(1))
